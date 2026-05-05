@@ -10,7 +10,7 @@
 
 I am interested in the space where software meets the physical world: robotics, computer vision, interactive tools, and products that feel polished from the first click.
 
-<a href="https://niharm.vercel.app/">
+<a href="https://niharm.me/">
   <img src="https://img.shields.io/badge/Website-niharm.vercel.app-14b8a6?style=for-the-badge&logo=vercel&logoColor=white" alt="Website" />
 </a>
 <a href="https://github.com/niharnm">
