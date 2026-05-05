@@ -16,8 +16,8 @@ I am interested in the space where software meets the physical world: robotics, 
 <a href="https://github.com/niharnm">
   <img src="https://img.shields.io/badge/GitHub-niharnm-181717?style=for-the-badge&logo=github" alt="GitHub" />
 </a>
-<a href="https://github.com/niharnm?tab=repositories">
-  <img src="https://img.shields.io/badge/Repositories-Explore-2563eb?style=for-the-badge&logo=github" alt="Repositories" />
+<a href="https://www.linkedin.com/in/nihar-manchikalapudi-3bba1b320/">
+  <img src="https://img.shields.io/badge/LinkedIn-Nihar%20Manchikalapudi-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
 </a>
 
 </div>
