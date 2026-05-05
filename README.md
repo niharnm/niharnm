@@ -10,6 +10,16 @@
 
 I am interested in the space where software meets the physical world: robotics, computer vision, interactive tools, and products that feel polished from the first click.
 
+<a href="https://niharm.vercel.app/">
+  <img src="https://img.shields.io/badge/Website-niharm.vercel.app-14b8a6?style=for-the-badge&logo=vercel&logoColor=white" alt="Website" />
+</a>
+<a href="https://github.com/niharnm">
+  <img src="https://img.shields.io/badge/GitHub-niharnm-181717?style=for-the-badge&logo=github" alt="GitHub" />
+</a>
+<a href="https://github.com/niharnm?tab=repositories">
+  <img src="https://img.shields.io/badge/Repositories-Explore-2563eb?style=for-the-badge&logo=github" alt="Repositories" />
+</a>
+
 </div>
 
 ---
@@ -53,12 +63,5 @@ Engineering     -> readable code, fast iteration, reliable demos
 ## Direction
 
 I am building toward projects that combine hardware, software, and intelligent feedback. The goal is simple: make technology feel more responsive, more useful, and more human.
-
-<div align="center">
-
-[![GitHub](https://img.shields.io/badge/GitHub-niharnm-181717?style=for-the-badge&logo=github)](https://github.com/niharnm)
-[![Repositories](https://img.shields.io/badge/Repositories-Explore-2563eb?style=for-the-badge&logo=github)](https://github.com/niharnm?tab=repositories)
-
-</div>
 
 ![Footer](https://capsule-render.vercel.app/api?type=waving&height=110&section=footer&color=0:14b8a6,100:2563eb)
