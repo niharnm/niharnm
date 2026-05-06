@@ -1,12 +1,12 @@
 <div align="center">
-  <img src="./images/header.svg" alt="Nihar Manchikalapudi" width="100%" />
+  <img src="./images/nihar-manchikalapudi-header.svg" alt="Nihar Manchikalapudi" width="100%" />
   <br />
-  <img src="./images/typing.svg" alt="Student builder making apps, robotics tools, Mac software, and practical data projects" width="100%" />
+  <img src="./images/nihar-manchikalapudi-typing.svg" alt="Nihar Manchikalapudi - upcoming engineer" width="100%" />
   <br />
   <br />
-  <a href="https://niharm.me/"><img src="./images/website.svg" alt="My Website" height="40" /></a>
-  <a href="mailto:nihar.manchikalapudi@gmail.com"><img src="./images/contact.svg" alt="Contact Me" height="40" /></a>
-  <a href="https://www.linkedin.com/in/nihar-manchikalapudi-3bba1b320/"><img src="./images/linkedin.svg" alt="LinkedIn" height="40" /></a>
+  <a href="https://niharm.me/"><img src="./images/nihar-manchikalapudi-website.svg" alt="Nihar Manchikalapudi website" height="40" /></a>
+  <a href="mailto:nihar.manchikalapudi@gmail.com"><img src="./images/nihar-manchikalapudi-contact.svg" alt="Contact Nihar Manchikalapudi" height="40" /></a>
+  <a href="https://www.linkedin.com/in/nihar-manchikalapudi-3bba1b320/"><img src="./images/nihar-manchikalapudi-linkedin.svg" alt="Nihar Manchikalapudi LinkedIn" height="40" /></a>
 </div>
 
 ---
@@ -33,7 +33,7 @@
 ## Toolbox
 
 <div align="center">
-  <img src="./images/toolbox.svg" alt="Swift, SwiftUI, C++, TypeScript, React, robotics, Vercel, Figma, Onshape" width="100%" />
+  <img src="./images/nihar-manchikalapudi-toolbox.svg" alt="Nihar Manchikalapudi toolbox" width="100%" />
 </div>
 
 ## What I Care About
