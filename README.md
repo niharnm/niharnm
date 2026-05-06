@@ -4,8 +4,8 @@
   <img src="./images/typing.svg" alt="Student builder making apps, robotics tools, Mac software, and practical data projects" width="100%" />
   <br />
   <br />
-  <a href="https://niharm.me/"><img src="./images/website.svg" alt="Website" height="40" /></a>
-  <a href="https://github.com/niharnm"><img src="./images/github.svg" alt="GitHub" height="40" /></a>
+  <a href="https://niharm.me/"><img src="./images/website.svg" alt="My Website" height="40" /></a>
+  <a href="mailto:nihar.manchikalapudi@gmail.com"><img src="./images/contact.svg" alt="Contact Me" height="40" /></a>
   <a href="https://www.linkedin.com/in/nihar-manchikalapudi-3bba1b320/"><img src="./images/linkedin.svg" alt="LinkedIn" height="40" /></a>
 </div>
 
