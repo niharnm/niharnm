@@ -1,7 +1,7 @@
 <svg width="1200" height="76" viewBox="0 0 1200 76" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title"><title id="title">Nihar Manchikalapudi animated role line</title><metadata id="niharm-profile-owner">owner=Nihar Manchikalapudi; site=https://niharm.me; github=https://github.com/niharnm</metadata><rect width="1200" height="76" rx="12" fill="#080808"/><rect x="1" y="1" width="1198" height="74" rx="11" stroke="#f4f4f1" stroke-opacity=".12"/><style>
-    .line { font: 700 24px Inter, ui-sans-serif, system-ui, sans-serif; fill: #d8d8d2; opacity: 0; }
-    .l1 { animation: show 9s infinite; }
-    .l2 { animation: show 9s infinite 3s; }
-    .l3 { animation: show 9s infinite 6s; }
+    .x { font: 700 24px Inter, ui-sans-serif, system-ui, sans-serif; fill: #d8d8d2; opacity: 0; }
+    .a { opacity: 1; animation: show 9s infinite; }
+    .b { animation: show 9s infinite 3s; }
+    .c { animation: show 9s infinite 6s; }
     @keyframes show { 0%{opacity:1} 28%{opacity:1} 36%{opacity:0} 100%{opacity:0} }
-  </style><text x="600" y="47" text-anchor="middle" class="line l1">Nihar builds useful software around school, automation, and engineering</text><text x="600" y="47" text-anchor="middle" class="line l2">Nihar explores robotics, data, AI, and product design</text><text x="600" y="47" text-anchor="middle" class="line l3">Nihar turns ambitious ideas into demos that actually run</text></svg>
+  </style><text x="600" y="47" text-anchor="middle" class="x a">&#98;&#117;&#105;&#108;&#100;&#105;&#110;&#103;&#32;&#112;&#114;&#97;&#99;&#116;&#105;&#99;&#97;&#108;&#32;&#115;&#111;&#102;&#116;&#119;&#97;&#114;&#101;</text><text x="600" y="47" text-anchor="middle" class="x b">&#101;&#120;&#112;&#108;&#111;&#114;&#105;&#110;&#103;&#32;&#114;&#111;&#98;&#111;&#116;&#105;&#99;&#115;&#44;&#32;&#100;&#97;&#116;&#97;&#44;&#32;&#97;&#110;&#100;&#32;&#65;&#73;</text><text x="600" y="47" text-anchor="middle" class="x c">&#116;&#117;&#114;&#110;&#105;&#110;&#103;&#32;&#105;&#100;&#101;&#97;&#115;&#32;&#105;&#110;&#116;&#111;&#32;&#119;&#111;&#114;&#107;&#105;&#110;&#103;&#32;&#100;&#101;&#109;&#111;&#115;</text></svg>
