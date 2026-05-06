@@ -47,4 +47,4 @@ Engineering     -> fast iteration, readable code, reliable demos
 
 ## Direction
 
-I am building toward projects that combine hardware, software, and intelligent feedback. The goal is simple: make technology feel more responsive, useful, and human.
+I like to work on projects that interest me, reach out to me for any inquiries. 
