@@ -116,7 +116,11 @@ jobs:
           git config --global user.name "Nihar Manchikalapudi"
           git config --global user.email "117209695+niharnm@users.noreply.github.com"
           git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
-          gh auth status || true
+          if gh auth status --hostname github.com >/dev/null 2>&1; then
+            echo "GitHub CLI authentication configured."
+          else
+            echo "GitHub CLI authentication check failed; continuing because git auth is configured."
+          fi
 
       - name: Build Codex prompt
         if: steps.gate.outputs.should_run == 'true'
