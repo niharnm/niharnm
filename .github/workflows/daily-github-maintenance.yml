@@ -71,7 +71,7 @@ jobs:
             exit 1
           fi
 
-          MODEL="${CODEX_MODEL:-gpt-5.5}"
+          MODEL="${CODEX_MODEL:-gpt-5.4-mini}"
           DIRECT_COMMITS="${ALLOW_DIRECT_COMMITS:-true}"
           AUTH_TOKEN="${GH_AUTOMATION_TOKEN:-${GITHUB_TOKEN:-}}"
 
