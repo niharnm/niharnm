@@ -35,7 +35,8 @@ Use this starting context to avoid repeating the same work too often:
 
 - Return JSON only when asked by the runner.
 - Only edit the candidate README file provided by the runner.
-- Do not invent unsupported features, commands, requirements, badges, screenshots, or links.
+- Do not invent unsupported features, commands, requirements, badges, screenshots, URLs, or links.
+- Do not mention exact localhost ports unless that exact port is already present in the README or explicitly shown in package scripts/config.
 - Do not add generated-by text, automation notes, dates, streak language, or filler.
 - Do not replace a useful README with generic marketing copy.
 - Prefer the smallest clean documentation improvement that is clearly supported by the repository context.
