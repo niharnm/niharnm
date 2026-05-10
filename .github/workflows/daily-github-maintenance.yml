@@ -43,16 +43,7 @@ jobs:
             exit 0
           fi
 
-          expected_schedule="$(python3 - <<'PY'
-from datetime import datetime, time
-from zoneinfo import ZoneInfo
-pacific = ZoneInfo("America/Los_Angeles")
-utc = ZoneInfo("UTC")
-today = datetime.now(pacific).date()
-run_at = datetime.combine(today, time(9, 0), pacific).astimezone(utc)
-print(f"0 {run_at.hour} * * *")
-PY
-)"
+          expected_schedule="$(python3 -c 'from datetime import datetime, time; from zoneinfo import ZoneInfo; p=ZoneInfo("America/Los_Angeles"); u=ZoneInfo("UTC"); d=datetime.now(p).date(); h=datetime.combine(d, time(9, 0), p).astimezone(u).hour; print(f"0 {h} * * *")')"
 
           if [ "${TRIGGER_SCHEDULE}" = "${expected_schedule}" ]; then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
