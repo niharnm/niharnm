@@ -77,7 +77,7 @@ jobs:
 
           MODEL="${GITHUB_MODELS_MODEL:-openai/gpt-4.1-mini}"
           DIRECT_COMMITS="${ALLOW_DIRECT_COMMITS:-true}"
-          MAX_CHANGES="${MAX_DAILY_CHANGES:-3}"
+          MAX_CHANGES="${MAX_DAILY_CHANGES:-5}"
           FALLBACK_ENABLED="${ALLOW_PROJECT_FALLBACK:-true}"
           FALLBACK_REPO="${PROJECT_FALLBACK_REPO:-niharnm/trend-build-lab}"
           WRITE_TOKEN="${GH_AUTOMATION_TOKEN:-${GITHUB_TOKEN:-}}"
