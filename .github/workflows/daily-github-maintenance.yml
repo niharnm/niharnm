@@ -24,11 +24,11 @@ jobs:
     env:
       TZ: America/Los_Angeles
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      GH_TOKEN: ${{ secrets.GH_AUTOMATION_TOKEN != '' && secrets.GH_AUTOMATION_TOKEN || github.token }}
-      GITHUB_TOKEN: ${{ secrets.GH_AUTOMATION_TOKEN != '' && secrets.GH_AUTOMATION_TOKEN || github.token }}
-      CODEX_MODEL: ${{ vars.CODEX_MODEL != '' && vars.CODEX_MODEL || 'gpt-5.5' }}
+      GH_AUTOMATION_TOKEN: ${{ secrets.GH_AUTOMATION_TOKEN }}
+      GITHUB_TOKEN: ${{ github.token }}
+      CODEX_MODEL: ${{ vars.CODEX_MODEL }}
       TARGET_REPOS: ${{ vars.TARGET_REPOS }}
-      ALLOW_DIRECT_COMMITS: ${{ vars.ALLOW_DIRECT_COMMITS != '' && vars.ALLOW_DIRECT_COMMITS || 'true' }}
+      ALLOW_DIRECT_COMMITS: ${{ vars.ALLOW_DIRECT_COMMITS }}
 
     steps:
       - name: Gate duplicate UTC schedules
@@ -65,10 +65,9 @@ PY
         if: steps.gate.outputs.should_run == 'true'
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_AUTOMATION_TOKEN != '' && secrets.GH_AUTOMATION_TOKEN || github.token }}
           fetch-depth: 0
 
-      - name: Resolve target repositories
+      - name: Resolve runtime configuration
         if: steps.gate.outputs.should_run == 'true'
         shell: bash
         run: |
@@ -80,23 +79,28 @@ PY
             echo "No target repositories configured." >&2
             exit 1
           fi
-          echo "TARGET_REPOS=${TARGET_REPOS}" >> "$GITHUB_ENV"
-          echo "Using target repositories: ${TARGET_REPOS}"
 
-      - name: Verify required secrets
-        if: steps.gate.outputs.should_run == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
+          MODEL="${CODEX_MODEL:-gpt-5.5}"
+          DIRECT_COMMITS="${ALLOW_DIRECT_COMMITS:-true}"
+          AUTH_TOKEN="${GH_AUTOMATION_TOKEN:-${GITHUB_TOKEN:-}}"
+
           if [ -z "${OPENAI_API_KEY:-}" ]; then
             echo "Missing OPENAI_API_KEY repository secret." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          if [ -z "${GH_TOKEN:-}" ]; then
+          if [ -z "${AUTH_TOKEN:-}" ]; then
             echo "Missing GitHub token." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          echo "::add-mask::${GH_TOKEN}"
+
+          echo "::add-mask::${AUTH_TOKEN}"
+          echo "TARGET_REPOS=${TARGET_REPOS}" >> "$GITHUB_ENV"
+          echo "CODEX_MODEL=${MODEL}" >> "$GITHUB_ENV"
+          echo "ALLOW_DIRECT_COMMITS=${DIRECT_COMMITS}" >> "$GITHUB_ENV"
+          echo "GH_TOKEN=${AUTH_TOKEN}" >> "$GITHUB_ENV"
+          echo "GITHUB_TOKEN=${AUTH_TOKEN}" >> "$GITHUB_ENV"
+          echo "Using target repositories: ${TARGET_REPOS}"
+          echo "Using Codex model: ${MODEL}"
 
       - name: Set up Node.js
         if: steps.gate.outputs.should_run == 'true'
@@ -151,8 +155,7 @@ PY
           codex exec \
             --cd "$GITHUB_WORKSPACE" \
             --model "$CODEX_MODEL" \
-            --ask-for-approval never \
-            --sandbox danger-full-access \
+            --dangerously-bypass-approvals-and-sandbox \
             --skip-git-repo-check \
             --ephemeral \
             --search \
