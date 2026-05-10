@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { appendFile, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { appendFile, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -11,6 +11,9 @@ const model = process.env.GITHUB_MODELS_MODEL || 'openai/gpt-4.1-mini';
 const modelsToken = process.env.GITHUB_MODELS_TOKEN || process.env.GITHUB_TOKEN;
 const gitToken = process.env.GH_TOKEN || process.env.GH_AUTOMATION_TOKEN || process.env.GITHUB_TOKEN;
 const allowDirectCommits = String(process.env.ALLOW_DIRECT_COMMITS || 'true').toLowerCase() === 'true';
+const allowProjectFallback = String(process.env.ALLOW_PROJECT_FALLBACK || 'true').toLowerCase() === 'true';
+const projectFallbackRepo = process.env.PROJECT_FALLBACK_REPO || 'niharnm/trend-build-lab';
+const maxDailyChanges = clamp(Number.parseInt(process.env.MAX_DAILY_CHANGES || '3', 10) || 3, 1, 5);
 const resultFile = process.env.GITHUB_MODELS_RESULT_FILE;
 const runUrl = process.env.GITHUB_SERVER_URL && process.env.GITHUB_REPOSITORY && process.env.GITHUB_RUN_ID
   ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
@@ -23,6 +26,10 @@ const secretValues = [
   process.env.GH_TOKEN,
   process.env.GH_AUTOMATION_TOKEN,
 ].filter(Boolean);
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
 
 function cleanLog(text) {
   let output = String(text || '');
@@ -60,6 +67,17 @@ function parseTargets() {
     .map((repo) => repo.trim())
     .filter((repo) => repo && !repo.startsWith('#'))
     .filter((repo, index, repos) => repos.indexOf(repo) === index);
+}
+
+function dailyChangeBudget() {
+  const key = [
+    new Date().toISOString().slice(0, 10),
+    process.env.GITHUB_RUN_NUMBER || '0',
+    process.env.GITHUB_REPOSITORY || 'repo',
+  ].join(':');
+  let hash = 0;
+  for (const char of key) hash = ((hash * 31) + char.charCodeAt(0)) >>> 0;
+  return 1 + (hash % maxDailyChanges);
 }
 
 function rotatedTargets(targets) {
@@ -176,11 +194,41 @@ async function askGithubModels({ repo, readmePath, readme, files, packageJson, r
   return extractJson(content);
 }
 
+async function askProjectBuild(signals) {
+  const signalText = signals.slice(0, 18).map((item, index) => {
+    return `${index + 1}. [${item.source}] ${item.title}${item.link ? ` - ${item.link}` : ''}`;
+  }).join('\n');
+
+  const prompt = [
+    'Use the trend signals below to propose and generate one small, useful static web project.',
+    'The project must be safe, original, and not a clone of a specific product or a fan page for a person.',
+    'Prefer practical tools, visual explainers, dashboards, calculators, study helpers, or local-first utilities.',
+    'Use only vanilla HTML, CSS, and JavaScript. No package manager, build step, external scripts, tracking, ads, or network calls from the app.',
+    'Return exactly one JSON object with this shape:',
+    '{"project_slug":"short-kebab-slug","project_name":"Project Name","rationale":"why this is useful","commit_message":"feat: start project name","files":[{"path":"README.md","content":"markdown"},{"path":"index.html","content":"html"},{"path":"styles.css","content":"css"},{"path":"app.js","content":"javascript"}]}',
+    'Allowed file paths are README.md, index.html, styles.css, app.js, and data.json. Include at least README.md, index.html, styles.css, and app.js.',
+    'Trend signals:',
+    signalText || 'No live trend signals were available; build a generally useful local-first web utility.',
+  ].join('\n\n');
+
+  const content = await completeWithGithubModels({
+    model,
+    temperature: 0.45,
+    max_tokens: 16000,
+    messages: [
+      { role: 'system', content: 'You generate small, complete, useful static web projects. Return JSON only.' },
+      { role: 'user', content: prompt },
+    ],
+  });
+
+  return extractJson(content);
+}
+
 function cleanCommitMessage(message) {
   const firstLine = String(message || '').split('\n')[0].trim().replace(/[.]+$/, '');
   const cleaned = firstLine.slice(0, 80);
   if (!cleaned) return 'docs: clarify README guidance';
-  if (/^(docs|fix|chore|test|refactor)(\(.+\))?: /i.test(cleaned)) return cleaned;
+  if (/^(docs|feat|fix|chore|test|refactor)(\(.+\))?: /i.test(cleaned)) return cleaned;
   return `docs: ${cleaned.charAt(0).toLowerCase()}${cleaned.slice(1)}`.slice(0, 80);
 }
 
@@ -283,6 +331,176 @@ async function tryRepo(repo, workDir, policy) {
   }
 }
 
+function decodeXml(text) {
+  return String(text || '')
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/<[^>]+>/g, '')
+    .trim();
+}
+
+function xmlField(block, tag) {
+  const match = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+  return decodeXml(match?.[1] || '');
+}
+
+function parseRssItems(xml, source) {
+  const itemBlocks = String(xml || '').match(/<item[\s\S]*?<\/item>/gi) || [];
+  return itemBlocks.map((block) => ({
+    source,
+    title: xmlField(block, 'title'),
+    link: xmlField(block, 'link'),
+  })).filter((item) => item.title).slice(0, 12);
+}
+
+async function fetchText(url) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch(url, { signal: controller.signal, headers: { 'User-Agent': 'github-models-maintenance/1.0' } });
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    return await response.text();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function fetchTrendSignals() {
+  const sources = [
+    { name: 'Google Trends US', url: 'https://trends.google.com/trending/rss?geo=US' },
+    { name: 'Hacker News', url: 'https://hnrss.org/frontpage' },
+  ];
+  const signals = [];
+  for (const source of sources) {
+    try {
+      const xml = await fetchText(source.url);
+      signals.push(...parseRssItems(xml, source.name));
+    } catch (error) {
+      console.log(`Trend source skipped: ${source.name}: ${cleanLog(error.message)}`);
+    }
+  }
+  return signals;
+}
+
+function projectSlug(value) {
+  const slug = String(value || 'trend-tool')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+  return slug || 'trend-tool';
+}
+
+function safeProjectFiles(files) {
+  const allowed = new Set(['README.md', 'index.html', 'styles.css', 'app.js', 'data.json']);
+  const normalized = [];
+  for (const file of Array.isArray(files) ? files : []) {
+    const filePath = String(file.path || '').replace(/^\.\//, '');
+    const content = String(file.content || '');
+    if (!allowed.has(filePath)) continue;
+    if (!content.trim() || content.length > 20000) continue;
+    if (filePath === 'index.html' && /<script\s+[^>]*src\s*=\s*["']https?:/i.test(content)) continue;
+    normalized.push({ path: filePath, content: content.endsWith('\n') ? content : `${content}\n` });
+  }
+  const required = new Set(['README.md', 'index.html', 'styles.css', 'app.js']);
+  for (const file of normalized) required.delete(file.path);
+  if (required.size) throw new Error(`Project proposal was missing required files: ${[...required].join(', ')}`);
+  return normalized.slice(0, 6);
+}
+
+function ensureProjectRepo(repo, workDir) {
+  const repoDir = path.join(workDir, repo.replace(/[\/]/g, '__'));
+  const clone = run('git', ['clone', '--depth', '25', `https://github.com/${repo}.git`, repoDir], { allowFailure: true });
+  if (clone.status === 0) return { repoDir, created: false };
+
+  const create = run('gh', [
+    'repo', 'create', repo,
+    '--public',
+    '--description', 'Small trend-inspired project experiments built from public signals',
+  ], { allowFailure: true });
+  if (create.status !== 0) {
+    throw new Error(`Could not clone or create ${repo}: ${clone.stderr || clone.stdout}\n${create.stderr || create.stdout}`);
+  }
+
+  run('git', ['clone', `https://github.com/${repo}.git`, repoDir]);
+  return { repoDir, created: true };
+}
+
+async function tryProjectFallback(workDir) {
+  if (!allowProjectFallback) return { changed: false, reason: 'Project fallback is disabled.' };
+
+  const signals = await fetchTrendSignals();
+  const proposal = await askProjectBuild(signals);
+  const slug = projectSlug(proposal.project_slug || proposal.project_name);
+  const date = new Date().toISOString().slice(0, 10);
+  const projectDirName = `${date}-${slug}`;
+  const files = safeProjectFiles(proposal.files);
+  const { repoDir, created } = ensureProjectRepo(projectFallbackRepo, workDir);
+
+  const hasHead = run('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repoDir, allowFailure: true }).status === 0;
+  let baseBranch = run('git', ['branch', '--show-current'], { cwd: repoDir, allowFailure: true }).stdout.trim() || 'main';
+  if (!hasHead) {
+    run('git', ['checkout', '-B', baseBranch], { cwd: repoDir });
+  }
+
+  const projectRoot = path.join(repoDir, 'projects', projectDirName);
+  const finalProjectDirName = existsSync(projectRoot) ? `${projectDirName}-${process.env.GITHUB_RUN_NUMBER || Date.now()}` : projectDirName;
+  const finalProjectRoot = path.join(repoDir, 'projects', finalProjectDirName);
+  await mkdir(finalProjectRoot, { recursive: true });
+
+  for (const file of files) {
+    await writeFile(path.join(finalProjectRoot, file.path), file.content, 'utf8');
+  }
+
+  const rootReadme = path.join(repoDir, 'README.md');
+  let readme = existsSync(rootReadme)
+    ? await readFile(rootReadme, 'utf8')
+    : '# Trend Build Lab\n\nSmall static projects generated from public trend signals and maintained as real code experiments.\n\n## Projects\n';
+  if (!/## Projects/.test(readme)) readme += '\n## Projects\n';
+  const projectName = String(proposal.project_name || finalProjectDirName).trim();
+  const rationale = String(proposal.rationale || 'Built from public trend signals as a small static project experiment.').trim();
+  readme += `\n- [${projectName}](projects/${finalProjectDirName}/) - ${rationale}\n`;
+  await writeFile(rootReadme, readme.endsWith('\n') ? readme : `${readme}\n`, 'utf8');
+
+  run('git', ['add', 'README.md', `projects/${finalProjectDirName}`], { cwd: repoDir });
+  run('git', ['diff', '--cached', '--check'], { cwd: repoDir });
+  const diff = run('git', ['diff', '--cached', '--stat'], { cwd: repoDir }).stdout.trim();
+  if (!diff) return { changed: false, reason: 'Project fallback produced no diff.' };
+
+  const commitMessage = cleanCommitMessage(proposal.commit_message || `feat: start ${projectName}`);
+  run('git', ['commit', '-m', commitMessage], { cwd: repoDir });
+  run('git', ['push', 'origin', `HEAD:${baseBranch}`], { cwd: repoDir });
+  const sha = run('git', ['rev-parse', 'HEAD'], { cwd: repoDir }).stdout.trim();
+
+  return {
+    changed: true,
+    repo: projectFallbackRepo,
+    link: `https://github.com/${projectFallbackRepo}/commit/${sha}`,
+    files: ['README.md', `projects/${finalProjectDirName}/`],
+    summary: created ? `Created ${projectFallbackRepo} and added ${projectName}.` : `Added ${projectName} to the trend build lab.`,
+    whyUseful: rationale,
+    check: 'git diff --cached --check',
+  };
+}
+
+function formatChanges(changes) {
+  if (!changes.length) return ['- Repo changed: none', '- Link: none', '- Files changed: none'];
+  return changes.flatMap((change, index) => [
+    `### Change ${index + 1}`,
+    `- Repo changed: ${change.repo}`,
+    `- Link: ${change.link}`,
+    `- Files changed: ${change.files.join(', ')}`,
+    `- Improved: ${change.summary || 'Project maintenance'}`,
+    `- Why useful: ${change.whyUseful || 'Useful, reviewable repository work.'}`,
+    `- Checks: ${change.check}`,
+    '',
+  ]);
+}
+
 async function main() {
   if (!modelsToken) throw new Error('Missing GITHUB_MODELS_TOKEN or GITHUB_TOKEN.');
   if (!gitToken) throw new Error('Missing GH_TOKEN/GH_AUTOMATION_TOKEN/GITHUB_TOKEN for git writes.');
@@ -290,52 +508,51 @@ async function main() {
   const targets = parseTargets();
   if (!targets.length) throw new Error('No TARGET_REPOS configured.');
 
+  const targetBudget = dailyChangeBudget();
   const policy = await readFile(path.join(repoRoot, '.github/automation/daily-maintenance-prompt.md'), 'utf8');
   const workDir = await mkdtemp(path.join(tmpdir(), 'github-models-maintenance-'));
+  const changes = [];
   const skips = [];
 
   for (const repo of rotatedTargets(targets)) {
+    if (changes.length >= targetBudget) break;
     console.log(`Inspecting ${repo} with ${model}`);
     try {
       const result = await tryRepo(repo, workDir, policy);
-      if (result.changed) {
-        await writeResult([
-          '## Daily GitHub Maintenance',
-          '',
-          `- Repo changed: ${result.repo}`,
-          `- Link: ${result.link}`,
-          `- Files changed: ${result.files.join(', ')}`,
-          `- Improved: ${result.summary || 'README documentation'}`,
-          `- Why useful: ${result.whyUseful || 'Makes project setup or usage clearer.'}`,
-          `- Checks: ${result.check}`,
-          `- Model: ${model}`,
-        ].join('\n'));
-        return;
-      }
-      skips.push(`- ${repo}: ${result.reason}`);
+      if (result.changed) changes.push(result);
+      else skips.push(`- ${repo}: ${result.reason}`);
     } catch (error) {
       skips.push(`- ${repo}: ${cleanLog(error.message)}`);
+    }
+  }
+
+  if (!changes.length) {
+    try {
+      const fallback = await tryProjectFallback(workDir);
+      if (fallback.changed) changes.push(fallback);
+      else skips.push(`- ${projectFallbackRepo}: ${fallback.reason}`);
+    } catch (error) {
+      skips.push(`- ${projectFallbackRepo}: ${cleanLog(error.message)}`);
     }
   }
 
   await writeResult([
     '## Daily GitHub Maintenance',
     '',
-    '- Repo changed: none',
-    '- Link: none',
-    '- Files changed: none',
-    '- Improved: none',
-    '- Why useful: no safe README update was found by the free GitHub Models runner',
-    '- Checks: repository readback only',
+    `- Useful-change budget for this run: ${targetBudget}`,
+    `- Changes made: ${changes.length}`,
     `- Model: ${model}`,
     '',
-    'Skipped candidates:',
+    ...formatChanges(changes),
+    changes.length ? '' : '- Improved: none',
+    changes.length ? '' : '- Why useful: no safe maintenance update or fallback project could be completed',
+    skips.length ? 'Skipped candidates:' : '',
     ...skips,
-  ].join('\n'));
+  ].filter((line) => line !== '').join('\n'));
 }
 
 main().catch(async (error) => {
   const message = cleanLog(error.stack || error.message || error);
-  await writeResult(`## Daily GitHub Maintenance\n\nRun failed before a safe change could be made.\n\n\`\`\`\n${message}\n\`\`\``);
+  await writeResult(`## Daily GitHub Maintenance\n\nRun failed before safe changes could be made.\n\n\`\`\`\n${message}\n\`\`\``);
   process.exit(1);
 });
