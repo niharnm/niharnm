@@ -25,7 +25,7 @@ Set these under **Settings -> Secrets and variables -> Actions -> Variables** if
 - `TARGET_REPOS`: comma-separated `owner/repo` list. If omitted, the workflow reads `.github/automation/targets.txt`.
 - `GITHUB_MODELS_MODEL`: GitHub Models model id. Defaults to `openai/gpt-4.1-mini`.
 - `ALLOW_DIRECT_COMMITS`: `true` or `false`. Defaults to `true`; the runner still limits direct commits to small README-only changes.
-- `MAX_DAILY_CHANGES`: maximum useful changes per run. Defaults to `3` and is clamped from `1` to `5`.
+- `MAX_DAILY_CHANGES`: maximum useful changes per run. Defaults to `5` and is clamped from `1` to `5`.
 - `ALLOW_PROJECT_FALLBACK`: `true` or `false`. Defaults to `true`.
 - `PROJECT_FALLBACK_REPO`: fallback repo for trend-inspired static projects. Defaults to `niharnm/trend-build-lab`.
 
