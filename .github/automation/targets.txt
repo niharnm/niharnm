@@ -1,0 +1,5 @@
+# One owner/repo per line. Keep this list limited to repos where unattended small maintenance is acceptable.
+niharnm/niharnm
+niharnm/PostureGuard
+niharnm/trinityautodetails
+sempersystems/semper-web
