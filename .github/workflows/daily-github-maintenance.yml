@@ -149,7 +149,6 @@ jobs:
             --dangerously-bypass-approvals-and-sandbox \
             --skip-git-repo-check \
             --ephemeral \
-            --search \
             --output-last-message "$RUNNER_TEMP/daily-maintenance-result.md" \
             - < "$RUNNER_TEMP/daily-maintenance-prompt.md" | tee "$RUNNER_TEMP/codex.log"
 
