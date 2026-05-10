@@ -21,7 +21,7 @@ concurrency:
 jobs:
   maintain:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     env:
       TZ: America/Los_Angeles
       GH_AUTOMATION_TOKEN: ${{ secrets.GH_AUTOMATION_TOKEN }}
@@ -30,6 +30,9 @@ jobs:
       GITHUB_MODELS_MODEL: ${{ vars.GITHUB_MODELS_MODEL }}
       TARGET_REPOS: ${{ vars.TARGET_REPOS }}
       ALLOW_DIRECT_COMMITS: ${{ vars.ALLOW_DIRECT_COMMITS }}
+      MAX_DAILY_CHANGES: ${{ vars.MAX_DAILY_CHANGES }}
+      ALLOW_PROJECT_FALLBACK: ${{ vars.ALLOW_PROJECT_FALLBACK }}
+      PROJECT_FALLBACK_REPO: ${{ vars.PROJECT_FALLBACK_REPO }}
 
     steps:
       - name: Gate duplicate UTC schedules
@@ -74,6 +77,9 @@ jobs:
 
           MODEL="${GITHUB_MODELS_MODEL:-openai/gpt-4.1-mini}"
           DIRECT_COMMITS="${ALLOW_DIRECT_COMMITS:-true}"
+          MAX_CHANGES="${MAX_DAILY_CHANGES:-3}"
+          FALLBACK_ENABLED="${ALLOW_PROJECT_FALLBACK:-true}"
+          FALLBACK_REPO="${PROJECT_FALLBACK_REPO:-niharnm/trend-build-lab}"
           WRITE_TOKEN="${GH_AUTOMATION_TOKEN:-${GITHUB_TOKEN:-}}"
           MODELS_TOKEN="${GITHUB_MODELS_TOKEN:-${GITHUB_TOKEN:-}}"
 
@@ -91,10 +97,15 @@ jobs:
           echo "TARGET_REPOS=${TARGET_REPOS}" >> "$GITHUB_ENV"
           echo "GITHUB_MODELS_MODEL=${MODEL}" >> "$GITHUB_ENV"
           echo "ALLOW_DIRECT_COMMITS=${DIRECT_COMMITS}" >> "$GITHUB_ENV"
+          echo "MAX_DAILY_CHANGES=${MAX_CHANGES}" >> "$GITHUB_ENV"
+          echo "ALLOW_PROJECT_FALLBACK=${FALLBACK_ENABLED}" >> "$GITHUB_ENV"
+          echo "PROJECT_FALLBACK_REPO=${FALLBACK_REPO}" >> "$GITHUB_ENV"
           echo "GH_TOKEN=${WRITE_TOKEN}" >> "$GITHUB_ENV"
           echo "GITHUB_MODELS_TOKEN=${MODELS_TOKEN}" >> "$GITHUB_ENV"
           echo "Using target repositories: ${TARGET_REPOS}"
           echo "Using GitHub Models model: ${MODEL}"
+          echo "Max daily useful changes: ${MAX_CHANGES}"
+          echo "Project fallback: ${FALLBACK_ENABLED} (${FALLBACK_REPO})"
 
       - name: Set up Node.js
         if: steps.gate.outputs.should_run == 'true'
