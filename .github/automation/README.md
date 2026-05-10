@@ -21,7 +21,7 @@ Without `GH_AUTOMATION_TOKEN`, GitHub's default `GITHUB_TOKEN` can normally writ
 Set these under **Settings -> Secrets and variables -> Actions -> Variables** if you want to override defaults:
 
 - `TARGET_REPOS`: comma-separated `owner/repo` list. If omitted, the workflow reads `.github/automation/targets.txt`.
-- `CODEX_MODEL`: model for Codex CLI. Defaults to `gpt-5.5`.
+- `CODEX_MODEL`: model for Codex CLI. Defaults to `gpt-5.4-mini`.
 - `ALLOW_DIRECT_COMMITS`: `true` or `false`. Defaults to `true`; the prompt still limits direct commits to tiny, low-risk changes.
 
 The workflow runs daily from GitHub-hosted infrastructure, so it does not depend on a laptop being on.
