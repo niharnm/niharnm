@@ -2,6 +2,12 @@ name: Daily GitHub Maintenance
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/daily-github-maintenance.yml"
+      - ".github/automation/**"
   schedule:
     # GitHub schedules are UTC. These two entries cover 9 AM America/Los_Angeles
     # during daylight and standard time; the gate step below runs only the right one.
