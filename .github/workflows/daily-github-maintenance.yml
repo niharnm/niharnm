@@ -1,0 +1,182 @@
+name: Daily GitHub Maintenance
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub schedules are UTC. These two entries cover 9 AM America/Los_Angeles
+    # during daylight and standard time; the gate step below runs only the right one.
+    - cron: "0 16 * * *"
+    - cron: "0 17 * * *"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: daily-github-maintenance
+  cancel-in-progress: false
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      TZ: America/Los_Angeles
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GH_TOKEN: ${{ secrets.GH_AUTOMATION_TOKEN != '' && secrets.GH_AUTOMATION_TOKEN || github.token }}
+      GITHUB_TOKEN: ${{ secrets.GH_AUTOMATION_TOKEN != '' && secrets.GH_AUTOMATION_TOKEN || github.token }}
+      CODEX_MODEL: ${{ vars.CODEX_MODEL != '' && vars.CODEX_MODEL || 'gpt-5.5' }}
+      TARGET_REPOS: ${{ vars.TARGET_REPOS }}
+      ALLOW_DIRECT_COMMITS: ${{ vars.ALLOW_DIRECT_COMMITS != '' && vars.ALLOW_DIRECT_COMMITS || 'true' }}
+
+    steps:
+      - name: Gate duplicate UTC schedules
+        id: gate
+        shell: bash
+        env:
+          TRIGGER_SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_EVENT_NAME}" != "schedule" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          expected_schedule="$(python3 - <<'PY'
+from datetime import datetime, time
+from zoneinfo import ZoneInfo
+pacific = ZoneInfo("America/Los_Angeles")
+utc = ZoneInfo("UTC")
+today = datetime.now(pacific).date()
+run_at = datetime.combine(today, time(9, 0), pacific).astimezone(utc)
+print(f"0 {run_at.hour} * * *")
+PY
+)"
+
+          if [ "${TRIGGER_SCHEDULE}" = "${expected_schedule}" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Skipping ${TRIGGER_SCHEDULE}; today's 9 AM Pacific schedule is ${expected_schedule}."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout automation host
+        if: steps.gate.outputs.should_run == 'true'
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_AUTOMATION_TOKEN != '' && secrets.GH_AUTOMATION_TOKEN || github.token }}
+          fetch-depth: 0
+
+      - name: Resolve target repositories
+        if: steps.gate.outputs.should_run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${TARGET_REPOS:-}" ]; then
+            TARGET_REPOS="$(awk 'NF && $1 !~ /^#/ {print $0}' .github/automation/targets.txt | paste -sd, -)"
+          fi
+          if [ -z "${TARGET_REPOS:-}" ]; then
+            echo "No target repositories configured." >&2
+            exit 1
+          fi
+          echo "TARGET_REPOS=${TARGET_REPOS}" >> "$GITHUB_ENV"
+          echo "Using target repositories: ${TARGET_REPOS}"
+
+      - name: Verify required secrets
+        if: steps.gate.outputs.should_run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${OPENAI_API_KEY:-}" ]; then
+            echo "Missing OPENAI_API_KEY repository secret." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "Missing GitHub token." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "::add-mask::${GH_TOKEN}"
+
+      - name: Set up Node.js
+        if: steps.gate.outputs.should_run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install and authenticate Codex CLI
+        if: steps.gate.outputs.should_run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install -g @openai/codex
+          codex --version
+          printenv OPENAI_API_KEY | codex login --with-api-key
+
+      - name: Configure git and GitHub auth
+        if: steps.gate.outputs.should_run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global user.name "Nihar Manchikalapudi"
+          git config --global user.email "117209695+niharnm@users.noreply.github.com"
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+          gh auth status || true
+
+      - name: Build Codex prompt
+        if: steps.gate.outputs.should_run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          prompt="$RUNNER_TEMP/daily-maintenance-prompt.md"
+          cp .github/automation/daily-maintenance-prompt.md "$prompt"
+          {
+            echo ""
+            echo "## Run context"
+            echo "- Host repository: ${GITHUB_REPOSITORY}"
+            echo "- Run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- Pacific time: $(TZ=America/Los_Angeles date '+%Y-%m-%d %H:%M:%S %Z')"
+            echo "- Target repositories: ${TARGET_REPOS}"
+            echo "- Direct commits allowed: ${ALLOW_DIRECT_COMMITS}"
+            echo ""
+            echo "## Recent host automation commits"
+            git log --oneline -n 20 -- .github/automation .github/workflows/daily-github-maintenance.yml || true
+          } >> "$prompt"
+
+      - name: Run Codex maintenance
+        if: steps.gate.outputs.should_run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          codex exec \
+            --cd "$GITHUB_WORKSPACE" \
+            --model "$CODEX_MODEL" \
+            --ask-for-approval never \
+            --sandbox danger-full-access \
+            --skip-git-repo-check \
+            --ephemeral \
+            --search \
+            --output-last-message "$RUNNER_TEMP/daily-maintenance-result.md" \
+            - < "$RUNNER_TEMP/daily-maintenance-prompt.md" | tee "$RUNNER_TEMP/codex.log"
+
+      - name: Write run summary
+        if: always() && steps.gate.outputs.should_run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -s "$RUNNER_TEMP/daily-maintenance-result.md" ]; then
+            {
+              echo "## Daily GitHub Maintenance"
+              cat "$RUNNER_TEMP/daily-maintenance-result.md"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Codex logs
+        if: always() && steps.gate.outputs.should_run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-github-maintenance-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/daily-maintenance-result.md
+            ${{ runner.temp }}/codex.log
+          if-no-files-found: ignore
