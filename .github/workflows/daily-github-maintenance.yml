@@ -12,6 +12,7 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  models: read
 
 concurrency:
   group: daily-github-maintenance
@@ -20,13 +21,13 @@ concurrency:
 jobs:
   maintain:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 30
     env:
       TZ: America/Los_Angeles
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       GH_AUTOMATION_TOKEN: ${{ secrets.GH_AUTOMATION_TOKEN }}
       GITHUB_TOKEN: ${{ github.token }}
-      CODEX_MODEL: ${{ vars.CODEX_MODEL }}
+      GITHUB_MODELS_TOKEN: ${{ github.token }}
+      GITHUB_MODELS_MODEL: ${{ vars.GITHUB_MODELS_MODEL }}
       TARGET_REPOS: ${{ vars.TARGET_REPOS }}
       ALLOW_DIRECT_COMMITS: ${{ vars.ALLOW_DIRECT_COMMITS }}
 
@@ -71,42 +72,35 @@ jobs:
             exit 1
           fi
 
-          MODEL="${CODEX_MODEL:-gpt-5.4-mini}"
+          MODEL="${GITHUB_MODELS_MODEL:-openai/gpt-4.1-mini}"
           DIRECT_COMMITS="${ALLOW_DIRECT_COMMITS:-true}"
-          AUTH_TOKEN="${GH_AUTOMATION_TOKEN:-${GITHUB_TOKEN:-}}"
+          WRITE_TOKEN="${GH_AUTOMATION_TOKEN:-${GITHUB_TOKEN:-}}"
+          MODELS_TOKEN="${GITHUB_MODELS_TOKEN:-${GITHUB_TOKEN:-}}"
 
-          if [ -z "${OPENAI_API_KEY:-}" ]; then
-            echo "Missing OPENAI_API_KEY repository secret." | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ -z "${MODELS_TOKEN:-}" ]; then
+            echo "Missing GitHub Models token." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          if [ -z "${AUTH_TOKEN:-}" ]; then
-            echo "Missing GitHub token." | tee -a "$GITHUB_STEP_SUMMARY"
+          if [ -z "${WRITE_TOKEN:-}" ]; then
+            echo "Missing GitHub write token." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
-          echo "::add-mask::${AUTH_TOKEN}"
+          echo "::add-mask::${WRITE_TOKEN}"
+          echo "::add-mask::${MODELS_TOKEN}"
           echo "TARGET_REPOS=${TARGET_REPOS}" >> "$GITHUB_ENV"
-          echo "CODEX_MODEL=${MODEL}" >> "$GITHUB_ENV"
+          echo "GITHUB_MODELS_MODEL=${MODEL}" >> "$GITHUB_ENV"
           echo "ALLOW_DIRECT_COMMITS=${DIRECT_COMMITS}" >> "$GITHUB_ENV"
-          echo "GH_TOKEN=${AUTH_TOKEN}" >> "$GITHUB_ENV"
-          echo "GITHUB_TOKEN=${AUTH_TOKEN}" >> "$GITHUB_ENV"
+          echo "GH_TOKEN=${WRITE_TOKEN}" >> "$GITHUB_ENV"
+          echo "GITHUB_MODELS_TOKEN=${MODELS_TOKEN}" >> "$GITHUB_ENV"
           echo "Using target repositories: ${TARGET_REPOS}"
-          echo "Using Codex model: ${MODEL}"
+          echo "Using GitHub Models model: ${MODEL}"
 
       - name: Set up Node.js
         if: steps.gate.outputs.should_run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-
-      - name: Install and authenticate Codex CLI
-        if: steps.gate.outputs.should_run == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          npm install -g @openai/codex
-          codex --version
-          printenv OPENAI_API_KEY | codex login --with-api-key
 
       - name: Configure git and GitHub auth
         if: steps.gate.outputs.should_run == 'true'
@@ -122,58 +116,21 @@ jobs:
             echo "GitHub CLI authentication check failed; continuing because git auth is configured."
           fi
 
-      - name: Build Codex prompt
+      - name: Run GitHub Models maintenance
         if: steps.gate.outputs.should_run == 'true'
         shell: bash
+        env:
+          GITHUB_MODELS_RESULT_FILE: ${{ runner.temp }}/daily-maintenance-result.md
         run: |
           set -euo pipefail
-          prompt="$RUNNER_TEMP/daily-maintenance-prompt.md"
-          cp .github/automation/daily-maintenance-prompt.md "$prompt"
-          {
-            echo ""
-            echo "## Run context"
-            echo "- Host repository: ${GITHUB_REPOSITORY}"
-            echo "- Run URL: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-            echo "- Pacific time: $(TZ=America/Los_Angeles date '+%Y-%m-%d %H:%M:%S %Z')"
-            echo "- Target repositories: ${TARGET_REPOS}"
-            echo "- Direct commits allowed: ${ALLOW_DIRECT_COMMITS}"
-            echo ""
-            echo "## Recent host automation commits"
-            git log --oneline -n 20 -- .github/automation .github/workflows/daily-github-maintenance.yml || true
-          } >> "$prompt"
+          node .github/automation/github-models-maintenance.mjs | tee "$RUNNER_TEMP/github-models-maintenance.log"
 
-      - name: Run Codex maintenance
-        if: steps.gate.outputs.should_run == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          codex exec \
-            --cd "$GITHUB_WORKSPACE" \
-            --model "$CODEX_MODEL" \
-            --dangerously-bypass-approvals-and-sandbox \
-            --skip-git-repo-check \
-            --ephemeral \
-            --output-last-message "$RUNNER_TEMP/daily-maintenance-result.md" \
-            - < "$RUNNER_TEMP/daily-maintenance-prompt.md" | tee "$RUNNER_TEMP/codex.log"
-
-      - name: Write run summary
-        if: always() && steps.gate.outputs.should_run == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -s "$RUNNER_TEMP/daily-maintenance-result.md" ]; then
-            {
-              echo "## Daily GitHub Maintenance"
-              cat "$RUNNER_TEMP/daily-maintenance-result.md"
-            } >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-      - name: Upload Codex logs
+      - name: Upload maintenance logs
         if: always() && steps.gate.outputs.should_run == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: daily-github-maintenance-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/daily-maintenance-result.md
-            ${{ runner.temp }}/codex.log
+            ${{ runner.temp }}/github-models-maintenance.log
           if-no-files-found: ignore
