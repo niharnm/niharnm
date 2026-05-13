@@ -48,3 +48,9 @@ Engineering     -> fast iteration, readable code, reliable demos
 ## Direction
 
 I like to work on projects that interest me. Feel free to reach out to me for any inquiries or collaboration opportunities.
+
+---
+
+## Contact
+
+If you'd like to get in touch, please use the email or LinkedIn links above. I welcome questions, feedback, and collaboration proposals.
