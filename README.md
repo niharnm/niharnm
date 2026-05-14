@@ -54,3 +54,9 @@ I like to work on projects that interest me. Feel free to reach out to me for an
 ## Contact
 
 If you'd like to get in touch, please use the email or LinkedIn links above. I welcome questions, feedback, and collaboration proposals.
+
+---
+
+## Note
+
+This repository serves as a personal profile and portfolio overview. For specific projects or code samples, please visit the linked repositories or contact me directly.
