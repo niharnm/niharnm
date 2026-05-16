@@ -60,3 +60,9 @@ If you'd like to get in touch, please use the email or LinkedIn links above. I w
 ## Note
 
 This repository serves as a personal profile and portfolio overview. For specific projects or code samples, please visit the linked repositories or contact me directly.
+
+---
+
+## Usage
+
+This repository is a personal profile and portfolio overview and does not contain runnable code or setup instructions. For detailed project information or code samples, please visit the linked repositories or contact me directly.
