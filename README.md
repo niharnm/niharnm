@@ -74,3 +74,9 @@ For detailed project information or code samples, please visit the linked reposi
 ## Clarification
 
 This repository is intended for showcasing my profile and portfolio. It does not include project source code or installation guides. For specific projects, please refer to their individual repositories linked on my profile or reach out via the contact information above.
+
+---
+
+## Additional Information
+
+This README is designed to provide a clear overview of the repository's purpose. Since this repository is a personal profile and portfolio overview, no setup or installation steps are necessary. For any questions or collaboration, please use the contact links provided above.
