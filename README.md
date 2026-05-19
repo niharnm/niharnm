@@ -80,3 +80,9 @@ This repository is intended for showcasing my profile and portfolio. It does not
 ## Additional Information
 
 This README is designed to provide a clear overview of the repository's purpose. Since this repository is a personal profile and portfolio overview, no setup or installation steps are necessary. For any questions or collaboration, please use the contact links provided above.
+
+---
+
+## Troubleshooting
+
+If you encounter any issues or have questions about the projects linked in this profile, please reach out via the contact links above for assistance or further information.
