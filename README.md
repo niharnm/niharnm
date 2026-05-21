@@ -86,3 +86,14 @@ This README is designed to provide a clear overview of the repository's purpose.
 ## Troubleshooting
 
 If you encounter any issues or have questions about the projects linked in this profile, please reach out via the contact links above for assistance or further information.
+
+---
+
+## How to Use This Repository
+
+This repository is a curated overview of my professional profile and portfolio projects. It is not intended to be cloned for development or deployment. To explore my work:
+
+- Visit the linked project repositories for source code and detailed documentation.
+- Use the contact links above to ask questions or propose collaborations.
+
+Thank you for your interest!
