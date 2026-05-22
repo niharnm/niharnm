@@ -97,3 +97,9 @@ This repository is a curated overview of my professional profile and portfolio p
 - Use the contact links above to ask questions or propose collaborations.
 
 Thank you for your interest!
+
+---
+
+## License
+
+This repository is licensed under the MIT License. See the LICENSE file for details.
