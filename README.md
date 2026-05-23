@@ -45,4 +45,8 @@ AI + Data       -> practical intelligence, automation, experiments
 Engineering     -> fast iteration, readable code, reliable demos
 ```
 
+---
 
+## Note
+
+This repository serves as a personal profile and portfolio overview. For specific projects or code samples, please visit the individual repositories linked from my website or contact me directly.
