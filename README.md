@@ -61,3 +61,9 @@ This repository is intended as a personal profile and overview. It does not cont
 - Contact me via email or LinkedIn for inquiries or collaborations.
 
 This README provides a summary of my interests and skills rather than setup or usage instructions.
+
+---
+
+## Additional Information
+
+If you are looking for code samples or project details, please refer to the specific repositories linked on my website or reach out to me directly. This repository is designed to give an overview of my professional interests and capabilities.
