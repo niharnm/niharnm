@@ -47,29 +47,6 @@ Engineering     -> fast iteration, readable code, reliable demos
 
 ---
 
-## Note
-
-This repository serves as a personal profile and portfolio overview. It does not contain runnable projects or code samples directly. For specific projects or code samples, please visit the individual repositories linked from my website or contact me directly.
-
----
-
-## How to Use This Repository
-
-This repository is intended as a personal profile and overview. It does not contain runnable projects or code samples directly. To explore my work:
-
-- Visit my website linked above for detailed project repositories.
-- Contact me via email or LinkedIn for inquiries or collaborations.
-
-This README provides a summary of my interests and skills rather than setup or usage instructions.
-
----
-
-## Additional Information
-
-If you are looking for code samples or project details, please refer to the specific repositories linked on my website or reach out to me directly. This repository is designed to give an overview of my professional interests and capabilities.
-
----
-
 ## License
 
 This repository is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
