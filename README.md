@@ -73,3 +73,9 @@ If you are looking for code samples or project details, please refer to the spec
 ## License
 
 This repository is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+
+---
+
+## Troubleshooting
+
+If you encounter broken links or missing information about specific projects, please check my website or contact me directly for the most up-to-date resources.
