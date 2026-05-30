@@ -56,3 +56,9 @@ This repository is licensed under the MIT License. See the [LICENSE](./LICENSE) 
 ## Troubleshooting
 
 If you encounter broken links or missing information about specific projects, please check my website or contact me directly for the most up-to-date resources.
+
+---
+
+## Contact
+
+For questions or collaborations, feel free to reach out via email or LinkedIn using the links above.
