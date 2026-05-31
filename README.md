@@ -62,3 +62,9 @@ If you encounter broken links or missing information about specific projects, pl
 ## Contact
 
 For questions or collaborations, feel free to reach out via email or LinkedIn using the links above.
+
+---
+
+## Note
+
+This repository serves as a personal portfolio and contact hub rather than a software project with setup or usage instructions.
