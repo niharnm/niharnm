@@ -68,3 +68,9 @@ For questions or collaborations, feel free to reach out via email or LinkedIn us
 ## Note
 
 This repository serves as a personal portfolio and contact hub rather than a software project with setup or usage instructions.
+
+---
+
+## Clarification
+
+This repository is intended as a personal showcase and does not contain software to install or run. For detailed project information or code, please visit my website or contact me directly.
