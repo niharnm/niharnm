@@ -74,3 +74,9 @@ This repository serves as a personal portfolio and contact hub rather than a sof
 ## Clarification
 
 This repository is intended as a personal showcase and does not contain software to install or run. For detailed project information or code, please visit my website or contact me directly.
+
+---
+
+## Suggestion
+
+If you are looking for specific projects or code samples, please visit my website at [https://niharm.me/](https://niharm.me/) where I maintain detailed repositories and documentation.
