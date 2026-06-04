@@ -45,34 +45,6 @@ AI + Data       -> practical intelligence, automation, experiments
 Engineering     -> fast iteration, readable code, reliable demos
 ```
 
----
-
-## License
-
-This repository is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
-
----
-
-## Troubleshooting
-
-If you encounter broken links or missing information about specific projects, please check my website or contact me directly for the most up-to-date resources.
-
----
-
-## Contact
-
-For questions or collaborations, feel free to reach out via email or LinkedIn using the links above.
-
----
-
-## Note
-
-This repository serves as a personal portfolio and contact hub rather than a software project with setup or usage instructions.
-
----
-
-## Clarification
-
 This repository is intended as a personal showcase and does not contain software to install or run. For detailed project information or code, please visit my website or contact me directly.
 
 ---
