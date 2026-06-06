@@ -54,3 +54,9 @@ For detailed project information, code samples, or to explore my work further, p
 ## Suggestion
 
 If you are looking for specific projects or code samples, please visit my website at [https://niharm.me/](https://niharm.me/) where I maintain detailed repositories and documentation.
+
+---
+
+## Note
+
+This repository is a personal portfolio and does not include runnable software or installation instructions. For any inquiries or collaborations, please use the contact links above.
