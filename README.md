@@ -45,9 +45,13 @@ AI + Data       -> practical intelligence, automation, experiments
 Engineering     -> fast iteration, readable code, reliable demos
 ```
 
-This repository is intended as a personal showcase and does not contain software to install or run.
+---
 
-For detailed project information, code samples, or to explore my work further, please visit my website or contact me directly.
+## Repository Purpose
+
+This repository serves as a personal portfolio and showcase of my interests and skills. It does not contain runnable software or installation instructions.
+
+For detailed project information, code samples, or to explore my work further, please visit my website or contact me directly using the links above.
 
 ---
 
@@ -57,6 +61,6 @@ If you are looking for specific projects or code samples, please visit my websit
 
 ---
 
-## Note
+## Contact
 
-This repository is a personal portfolio and does not include runnable software or installation instructions. For any inquiries or collaborations, please use the contact links above.
+For any inquiries, collaborations, or questions, please use the contact links at the top of this README.
