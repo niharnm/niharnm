@@ -64,3 +64,9 @@ If you are looking for specific projects or code samples, please visit my websit
 ## Contact
 
 For any inquiries, collaborations, or questions, please use the contact links at the top of this README.
+
+---
+
+## Note
+
+This README is intentionally minimal and focused on portfolio presentation. For any updates or new projects, please check my website or reach out via the contact links.
