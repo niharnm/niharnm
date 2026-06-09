@@ -70,3 +70,9 @@ For any inquiries, collaborations, or questions, please use the contact links at
 ## Note
 
 This README is intentionally minimal and focused on portfolio presentation. For any updates or new projects, please check my website or reach out via the contact links.
+
+---
+
+## Troubleshooting
+
+If images or links do not display correctly, please ensure you are viewing this README on GitHub or a compatible Markdown viewer that supports relative image paths.
