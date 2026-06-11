@@ -51,7 +51,3 @@ Engineering     -> fast iteration, readable code, reliable demos
 For any inquiries, collaborations, or questions, please use the contact links at the top of this README.
 
 ---
-
-## Troubleshooting
-
-If images or links do not display correctly, please ensure you are viewing this README on GitHub or a compatible Markdown viewer that supports relative image paths.
