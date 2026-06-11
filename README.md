@@ -44,32 +44,11 @@ Apps + UX       -> clean flows, polished interfaces, useful student tools
 AI + Data       -> practical intelligence, automation, experiments
 Engineering     -> fast iteration, readable code, reliable demos
 ```
-
----
-
-## Repository Purpose
-
-This repository serves as a personal portfolio and showcase of my interests and skills. It does not contain runnable software or installation instructions.
-
-For detailed project information, code samples, or to explore my work further, please visit my website or contact me directly using the links above.
-
----
-
-## Suggestion
-
-If you are looking for specific projects or code samples, please visit my website at [https://niharm.me/](https://niharm.me/) where I maintain detailed repositories and documentation.
-
 ---
 
 ## Contact
 
 For any inquiries, collaborations, or questions, please use the contact links at the top of this README.
-
----
-
-## Note
-
-This README is intentionally minimal and focused on portfolio presentation. For any updates or new projects, please check my website or reach out via the contact links.
 
 ---
 
