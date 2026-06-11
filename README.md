@@ -51,3 +51,7 @@ Engineering     -> fast iteration, readable code, reliable demos
 For any inquiries, collaborations, or questions, please use the contact links at the top of this README.
 
 ---
+
+## Note
+
+This repository serves as a personal profile and showcase of my interests and skills. It does not contain software projects or code to run.
