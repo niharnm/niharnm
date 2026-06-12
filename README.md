@@ -55,3 +55,9 @@ For any inquiries, collaborations, or questions, please use the contact links at
 ## Note
 
 This repository serves as a personal profile and showcase of my interests and skills. It does not contain software projects or code to run.
+
+---
+
+## Usage Note
+
+This repository is intended solely as a personal profile and does not include runnable code or software projects. Please visit my website or contact me directly for more information or collaboration opportunities.
