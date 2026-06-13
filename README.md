@@ -61,3 +61,9 @@ This repository serves as a personal profile and showcase of my interests and sk
 ## Usage Note
 
 This repository is intended solely as a personal profile and does not include runnable code or software projects. Please visit my website or contact me directly for more information or collaboration opportunities.
+
+---
+
+## Troubleshooting
+
+If images or links do not display correctly, please ensure you are viewing this README on GitHub or a compatible Markdown viewer that supports relative image paths.
