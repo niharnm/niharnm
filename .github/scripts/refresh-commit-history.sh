@@ -14,6 +14,9 @@ fetch_chart() {
   curl --fail --silent --show-error --location \
     --retry 3 \
     --retry-all-errors \
+    --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140.0 Safari/537.36" \
+    --header "Accept: image/svg+xml,image/*;q=0.8,*/*;q=0.5" \
+    --header "Referer: https://github.com/niharnm/niharnm" \
     "https://commit-history.com/embed/niharnm?theme=$theme&metric=commits" \
     --output "$destination"
 
