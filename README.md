@@ -44,8 +44,8 @@
   <br />
   <a href="https://commit-history.com/niharnm">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="./images/niharnm-commit-history-dark.svg" />
-      <img alt="niharnm's commit history" src="./images/niharnm-commit-history-light.svg" width="100%" />
+      <source media="(prefers-color-scheme: dark)" srcset="https://wsrv.nl/?url=commit-history.com%2Fembed%2Fniharnm%3Ftheme%3Ddark%26metric%3Dcommits%26v%3D2026-08&amp;filt=duotone&amp;start=080808&amp;stop=f4f4f1&amp;mod=1.6&amp;output=png&amp;maxage=1d" />
+      <img alt="niharnm's commit history" src="https://wsrv.nl/?url=commit-history.com%2Fembed%2Fniharnm%3Fmetric%3Dcommits%26v%3D2026-08&amp;filt=duotone&amp;start=111111&amp;stop=f4f4f1&amp;output=png&amp;maxage=1d" width="100%" />
     </picture>
   </a>
 </div>
