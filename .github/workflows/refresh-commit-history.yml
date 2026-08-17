@@ -20,20 +20,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Advance the image cache
-        run: |
-          cache_month="$(date -u +%Y-%m)"
-          CACHE_MONTH="$cache_month" perl -0pi -e 's/v%3D[0-9]{4}-[0-9]{2}/v%3D$ENV{CACHE_MONTH}/g' README.md
-          grep --quiet "v%3D${cache_month}" README.md
+      - name: Refresh themed charts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/refresh-commit-history.sh
 
-      - name: Publish the new cache key
+      - name: Publish changed charts
         run: |
-          if git diff --quiet -- README.md; then
+          if git diff --quiet -- images/niharnm-commit-history-light.svg images/niharnm-commit-history-dark.svg; then
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md
+          git add images/niharnm-commit-history-light.svg images/niharnm-commit-history-dark.svg
           git commit -m "chore: refresh commit history"
           git push
