@@ -36,6 +36,20 @@
   <img src="./images/nihar-manchikalapudi-toolbox.svg" alt="Nihar Manchikalapudi toolbox" width="100%" />
 </div>
 
+## Build Log
+
+<div align="center">
+  <sub>A live record of the work, from first commit to now.</sub>
+  <br />
+  <br />
+  <a href="https://commit-history.com/niharnm">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./images/niharnm-commit-history-dark.svg" />
+      <img alt="niharnm's commit history" src="./images/niharnm-commit-history-light.svg" width="100%" />
+    </picture>
+  </a>
+</div>
+
 ## What I Care About
 
 ```txt
